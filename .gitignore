@@ -1,6 +1,7 @@
 # Custom
 .DS_Store
 .env
+speech_to_text/pretrained_models/
 
 
 *.bundle.*

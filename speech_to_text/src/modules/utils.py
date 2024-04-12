@@ -4,19 +4,29 @@ from pathlib import Path
 import json
 
 
-def output_to_pdf():
-    """Transform output and convert to PDF."""
+
+
+
+#TODO:determine valididty of audio files
+#ref: https://librosa.org/doc/main/generated/librosa.util.valid_audio.html
+
+
+
+def output_to_pdf(lines, filename=None, output_type='file'):
+    """Transform output and convert to PDF.
     file_path = Path('./output.json')
     with open(file_path, ) as f:
         output = json.load(f)
     lines = output['chunks']
-    
+
+    'results.pdf'
+    """
     results = []
     
     timestamps = [line['timestamp'] for line in lines]
     stamps = [[-1,-1] for idx in range(len(timestamps))]
     trigger = False
-    for idx, stamp in enumerate( range(len(timestamps) )):
+    for idx in range(len(timestamps)):
         if idx==0:
             stamps[0] = timestamps[0]
         elif (timestamps[idx][0] == timestamps[idx-1][1]) and trigger==False:
@@ -27,22 +37,31 @@ def output_to_pdf():
             stamps[idx] = [ timestamps[idx-1][1], timestamps[idx-1][1] + timestamps[idx][1] ]
             trigger = True
 
-    for idx in range(len(timestamps)-1):
+    for idx in range(len(timestamps)):
         item = f'{stamps[idx]}  -  {lines[idx]["text"]} \n'
         results.append(item)
 
-    print( ('').join(results) )
+    #print( ('').join(results) )
     str_results = ('').join(results)
-    text_to_pdf(str_results, 'results.pdf')
+    pdf = text_to_pdf(str_results)
 
-
-
+    if output_type=='file':
+        pdf.output(filename, 'F')
+        return True
+    elif output_type=='str':
+        return pdf
+    else:
+        raise TypeError(f'argument "output_type" must be: "file" or "str"; parameter provided: {output_type}')
 
 
 import textwrap
 from fpdf import FPDF
 
-def text_to_pdf(text, filename):
+def text_to_pdf(text):
+    """Convert text to PDF object.
+    
+    ref: https://stackoverflow.com/questions/10112244/convert-plain-text-to-pdf-in-python
+    """
     a4_width_mm = 210
     pt_to_mm = 0.35
     fontsize_pt = 10
@@ -66,8 +85,9 @@ def text_to_pdf(text, filename):
         for wrap in lines:
             pdf.cell(0, fontsize_mm, wrap, ln=1)
 
-    pdf.output(filename, 'F')
+    return pdf
 
 
 
-output_to_pdf()
+if __name__ == "__main__":
+    output_to_pdf()
