@@ -97,10 +97,20 @@ def run_workflow():
 
     pdfs = []
     for dialogue in dialogues:
+        #to file
+        output_name = Path('./tests/results') / f"{dialogue['file_name']}.pdf"
         pdf = utils.output_to_pdf(
             lines=dialogue['chunks'], 
+            filename=output_name,
+            output_type='file'
+        )
+        '''
+        #to string
+        pdf = utils.output_to_pdf(
+            lines=dialogue['chunks'],
             output_type='str'
         )
+        '''
         pdfs.append(pdf)
 
     
