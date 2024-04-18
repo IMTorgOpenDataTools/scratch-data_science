@@ -4,13 +4,16 @@ Module Docstring
 
 """
 
-from src import config_environment
+from src.modules import config_env
+
+from pathlib import Path
+import json
 
 
-def prepare():
+def finetune():
     """..."""
 
-    config_environment.config()
+    config_env.config()
 
     #load model
     from setfit import SetFitModel
@@ -18,42 +21,19 @@ def prepare():
     model = SetFitModel.from_pretrained("BAAI/bge-small-en-v1.5")
 
 
-    #get trainin records
+    #get train / test records
     from datasets import load_dataset, Dataset
 
-    train_records = [
-        {'text': 'I was sick.',
-         'label': 'positive'
-         },
-        {'text': 'My husband lost his job',
-         'label': 'positive'
-         },
-         {'text': 'I got a raise at work',
-         'label': 'negative'
-         },
-         {'text': 'I lost my dog to cancer',
-         'label': 'negative'
-         },
-         ]
+    data_path = Path('./src/data')
+    with open(data_path / 'train.json', 'r') as file:
+        train_records = json.load(file)['records']
     #train_dataset = load_dataset(records)         #<<<FAILS HERE, maybe use this: Dataset.from_dict(
     train_dataset = Dataset.from_list(train_records)
 
-    test_records = [
-        {'text': "I got the flu and felt very bad.",
-         'label': 'positive'
-         },
-        {'text': "I got a raise and feel great.",
-         'label': 'negative'
-         },
-        {'text': "This bank is awful.",
-         'label': 'negative'
-         },
-        {'text': 'He company laid him off.',
-         'label': 'positive'
-         },
-         ]
-
+    with open(data_path / 'test.json', 'r') as file:
+        test_records = json.load(file)['records']
     test_dataset = Dataset.from_list(test_records)
+
     model.labels = ["negative", "positive"]
 
 
@@ -72,8 +52,6 @@ def prepare():
     trainer.train()
 
 
-
-
     #test model
     metrics = trainer.evaluate(test_dataset)
     print(metrics)
@@ -85,6 +63,13 @@ def prepare():
         ])
     print(f'predictions: {preds}')
     '''
-    model.save_pretrained("pretrained_models/finetuned--BAAI")     #TODO:ERROR - jinja2.exceptions.TemplateAssertionError: no test named 'False'
 
-    return True
+
+    #save model
+    model_path = Path("pretrained_models/finetuned--BAAI")
+    model.save_pretrained(model_path )
+    model2 = SetFitModel.from_pretrained(model_path )
+    result = True
+    if not model2:
+        result = False
+    return result

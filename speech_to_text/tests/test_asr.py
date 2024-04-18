@@ -15,5 +15,5 @@ def test_asr_workflow():
 from src import prepare_models
 
 def test_prepare_models():
-    tmp = prepare_models.prepare()
+    tmp = prepare_models.finetune()
     assert tmp == True

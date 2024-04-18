@@ -2,11 +2,6 @@
 """
 Module Docstring
 
-
-Note:
-  * use `whisper-large`, [ref](https://huggingface.co/openai/whisper-large-v2#long-form-transcription)
-  * 'taunt-FAILS.wav' fails without error
-  * chunk_length_s [explanation](https://huggingface.co/blog/asr-chunking)
 """
 
 __author__ = "Your Name"
@@ -15,7 +10,7 @@ __license__ = "MIT"
 
 
 
-from src import config_environment
+from src.modules import config_env
 
 import os
 from pathlib import Path
@@ -26,7 +21,7 @@ from pathlib import Path
 def run_workflow():
     """..."""
 
-    config_environment.config()
+    config_env.config()
 
     #load data
     path_samples = Path('./samples')
@@ -84,15 +79,16 @@ def run_workflow():
         dialogues.append(record)
 
 
-    #TODO:classification models on each: chunk,item
+    #run classification models on each: chunk,item
     from src.classification import classifier
 
     for idx, dialogue in enumerate(dialogues):
         dialogues[idx]['classifier'] = []
         for chunk in dialogue['chunks']:
-            result = classifier(chunk)
-            if result != None:
-                dialogues[idx]['classifier'].extend(result)
+            results = classifier(chunk)
+            for result in results:
+               if result != None:
+                  dialogues[idx]['classifier'].append(result)
 
 
     #TODO:change to zip file

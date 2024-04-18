@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
 Module Docstring
+
 """
 
 
 def classifier(chunk):
-    """..."""
+    """Importable function to run assigned models."""
     result = []
     models = [
         kw_classifier,
@@ -46,7 +47,10 @@ def phrase_classifier(chunk):
 def fs_classifier(chunk):
     """..."""
 
-    from transformers import AutoModel
+    #from transformers import AutoModel
+    from setfit import SetFitModel
+
+    from pathlib import Path
 
     result = {
         'search': 'FS',
@@ -54,8 +58,9 @@ def fs_classifier(chunk):
         'timestamp': None,
         'pred': None
         }
-    model = AutoModel.from_pretrained("src/pretrained_models/finetuned--BAAI")
-    probs = model.predict_prob(chunk['text'])
+    model_path = Path("pretrained_models/finetuned--BAAI")
+    model = SetFitModel.from_pretrained(model_path)
+    probs = model.predict_proba(chunk['text'])
     if probs[1] > .5:
         result['target'] = chunk['text']
         result['timestamp'] = chunk['timestamp']
