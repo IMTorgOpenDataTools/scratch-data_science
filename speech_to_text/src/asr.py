@@ -18,11 +18,11 @@ from pathlib import Path
 
 
 
-def run_workflow():
+def run_workflow(sound_files):
     """..."""
 
     config_env.config()
-
+    """
     #load data
     path_samples = Path('./samples')
     sound_files = [f'./samples/{file}' for file in 
@@ -36,6 +36,7 @@ def run_workflow():
 
     #TODO:remove
     sound_files = sound_files       #[3:4] #fails
+    """
 
 
     #prepare data
@@ -91,12 +92,12 @@ def run_workflow():
                   dialogues[idx]['classifier'].append(result)
 
 
-    #TODO:change to zip file
     #format output
     from src.modules import utils
 
     pdfs = []
     for dialogue in dialogues:
+        '''
         #to file
         output_name = Path('./tests/results') / f"{dialogue['file_name']}.pdf"
         pdf = utils.output_to_pdf(
@@ -107,14 +108,23 @@ def run_workflow():
         '''
         #to string
         pdf = utils.output_to_pdf(
-            lines=dialogue['chunks'],
+            dialogue=dialogue,
             output_type='str'
         )
-        '''
         pdfs.append(pdf)
 
+    #TODO:change to zip file
+    '''
+    * prepare output by loading Workspace, then extracting schema
+    * fill-in key values
+    * (later: use EnteroDoc to extract info)
+    * 
+    * export and zip
+    '''
+    #utils.export_to_vdi_workspace(pdfs)
+
     
-    return True
+    return pdfs
 
 
 

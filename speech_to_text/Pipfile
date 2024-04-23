@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 setfit = "*"
 transformers = "==4.36.0"
+fpdf = "*"
+pypdf = "*"
 
 [dev-packages]
 
